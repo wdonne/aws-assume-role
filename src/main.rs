@@ -9,10 +9,10 @@ use aws_sdk_sts::operation::get_caller_identity::GetCallerIdentityError;
 use aws_sdk_sts::types::Credentials;
 use base64::prelude::BASE64_STANDARD;
 use base64::{DecodeError, Engine};
+use chrono::{DateTime, TimeDelta, Utc};
 use futures::StreamExt;
 use k8s_openapi::api::core::v1::Secret;
 use k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
-use k8s_openapi::chrono::{DateTime, TimeDelta, Utc};
 use k8s_openapi::ByteString;
 use kube::api::{Patch, PatchParams};
 use kube::runtime::controller::Action;
@@ -215,7 +215,7 @@ fn error_policy(_object: Arc<AWSAssumeRole>, _err: &OperatorError, _ctx: Arc<Dat
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    const VERSION: &str = "1.0.0";
+    const VERSION: &str = "1.0.1";
 
     env_logger::init();
     default_provider()
