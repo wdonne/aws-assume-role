@@ -123,3 +123,5 @@ helm repo add wdonne https://wdonne.github.io/helm
 helm repo update
 helm install aws-assume-role wdonne/aws-assume-role --namespace aws-assume-role --create-namespace
 ```
+
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/wdonne/aws-assume-role)
