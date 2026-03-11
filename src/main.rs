@@ -215,7 +215,7 @@ fn error_policy(_object: Arc<AWSAssumeRole>, _err: &OperatorError, _ctx: Arc<Dat
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    const VERSION: &str = "1.0.1";
+    const VERSION: &str = "1.0.2";
 
     env_logger::init();
     default_provider()
