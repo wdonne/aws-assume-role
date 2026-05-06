@@ -1,4 +1,4 @@
-FROM alpine:3.9.6 AS builder
+FROM alpine:3.22.4 AS builder
 ARG TARGETPLATFORM
 COPY target/aarch64-unknown-linux-musl/release/aws-assume-role /target/aarch64-unknown-linux-musl/release/
 COPY target/x86_64-unknown-linux-musl/release/aws-assume-role /target/x86_64-unknown-linux-musl/release/

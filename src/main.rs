@@ -16,10 +16,11 @@ use k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 use k8s_openapi::ByteString;
 use kube::api::{Patch, PatchParams};
 use kube::runtime::controller::Action;
-use kube::runtime::{watcher, Config, Controller};
+use kube::runtime::watcher;
 use kube::{Api, Client, Resource, ResourceExt};
 use kube_operator_util::status::set_ready;
-use log::{error, info};
+use kube_operator_util::util::{report_reconciliation, serial_controller};
+use log::info;
 use ::resource::{AWSAssumeRole, SecretType};
 use rustls::crypto::ring::default_provider;
 use serde_json::json;
@@ -215,7 +216,7 @@ fn error_policy(_object: Arc<AWSAssumeRole>, _err: &OperatorError, _ctx: Arc<Dat
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    const VERSION: &str = "1.0.2";
+    const VERSION: &str = "1.0.3";
 
     env_logger::init();
     default_provider()
@@ -231,10 +232,8 @@ async fn main() -> Result<()> {
 
     info!("Version: {VERSION}");
 
-    Controller::new(assume_roles, watcher::Config::default())
+    serial_controller(&assume_roles)
         .owns(secrets, watcher::Config::default())
-        .with_config(Config::default().concurrency(1))
-        .shutdown_on_signal()
         .run(
             reconcile,
             error_policy,
@@ -244,12 +243,7 @@ async fn main() -> Result<()> {
                 sts_client,
             }),
         )
-        .for_each(|res| async move {
-            match res {
-                Ok(o) => info!("Reconciled {o:?}"),
-                Err(e) => error!("Reconciliation failed: {}", source_message(&e)),
-            }
-        })
+        .for_each(|res| async { report_reconciliation(res) })
         .await;
 
     Ok(())
