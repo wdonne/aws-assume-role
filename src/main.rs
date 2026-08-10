@@ -1,4 +1,5 @@
 use crate::OperatorError::{EcrTokenFormat, NoCredentials, NoEcrToken, NoRepositoryUrl};
+use ::resource::{AWSAssumeRole, SecretType};
 use anyhow::Result;
 use aws_config::BehaviorVersion;
 use aws_sdk_ecr::config::http::HttpResponse;
@@ -11,9 +12,9 @@ use base64::prelude::BASE64_STANDARD;
 use base64::{DecodeError, Engine};
 use chrono::{DateTime, TimeDelta, Utc};
 use futures::StreamExt;
+use k8s_openapi::ByteString;
 use k8s_openapi::api::core::v1::Secret;
 use k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
-use k8s_openapi::ByteString;
 use kube::api::{Patch, PatchParams};
 use kube::runtime::controller::Action;
 use kube::runtime::watcher;
@@ -21,7 +22,6 @@ use kube::{Api, Client, Resource, ResourceExt};
 use kube_operator_util::status::set_ready;
 use kube_operator_util::util::{report_reconciliation, serial_controller};
 use log::info;
-use ::resource::{AWSAssumeRole, SecretType};
 use rustls::crypto::ring::default_provider;
 use serde_json::json;
 use std::collections::BTreeMap;
@@ -34,6 +34,7 @@ use thiserror::Error;
 use uuid::Uuid;
 
 const DEFAULT_DURATION: i32 = 900;
+const VERSION: &str = "1.0.4";
 
 struct Data {
     account_id: String,
@@ -216,8 +217,6 @@ fn error_policy(_object: Arc<AWSAssumeRole>, _err: &OperatorError, _ctx: Arc<Dat
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    const VERSION: &str = "1.0.3";
-
     env_logger::init();
     default_provider()
         .install_default()
