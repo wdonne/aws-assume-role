@@ -34,7 +34,7 @@ use thiserror::Error;
 use uuid::Uuid;
 
 const DEFAULT_DURATION: i32 = 900;
-const VERSION: &str = "1.0.4";
+const VERSION: &str = "1.0.5";
 
 struct Data {
     account_id: String,
